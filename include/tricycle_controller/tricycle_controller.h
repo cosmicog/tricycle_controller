@@ -96,19 +96,10 @@ private:
   ros::Time last_state_publish_time_;
   bool open_loop_;
 
-  /// Frame to use for odometry and odom tf:
-  std::string odom_frame_id_;
-
-  /// Whether to publish odometry to tf or not:
-  bool enable_odom_tf_;
-
-  // Delay odom tf time stamp to fix DWA local plenner problem
-  bool post_date_odom_tf_;
+  double wheel_radius_;
 
   /// Wheel base (distance between front and rear wheel):
   double wheel_base_;
-
-  double wheel_radius_;
 
   /// Timeout to consider cmd_vel commands old:
   double cmd_vel_timeout_;
@@ -116,12 +107,19 @@ private:
   /// Whether to allow multiple publishers on cmd_vel topic or not:
   bool allow_multiple_cmd_vel_publishers_;
 
+  /// Frame to use for the robot base:
+  std::string base_frame_id_;
+  /// Frame to use for odometry and odom tf:
+  std::string odom_frame_id_;
+  /// Whether to publish odometry to tf or not:
+  bool enable_odom_tf_;
+
   /// If the diffrence between desired steer angle its joint state is larger
   /// than angle_tolerance, stop wheel from turning
   double angle_tolerance_;
 
-  /// Frame to use for the robot base:
-  std::string base_frame_id_;
+  // Delay odom tf time stamp to fix DWA local plenner problem
+  bool post_date_odom_tf_;
 
   /// Speed limiters:
   Command last1_cmd_;

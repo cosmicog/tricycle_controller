@@ -10,15 +10,21 @@
 #include <tricycle_controller/tricycle_controller.h>
 #include <urdf_geometry_parser/urdf_geometry_parser.h>
 
+/// TODO: Fix more warnings when migrating..
 
 namespace tricycle_controller
 {
 
-TricycleController::TricycleController()
-    : command_struct_(), wheel_radius_(0.0), wheel_base_(0.0),
-      cmd_vel_timeout_(0.5), base_frame_id_("base_footprint"),
-      odom_frame_id_("odom"), enable_odom_tf_(true), angle_tolerance_(0.2),
-      post_date_odom_tf_(true) {}
+TricycleController::TricycleController():
+    command_struct_(),
+    wheel_radius_(0.0),
+    wheel_base_(0.0),
+    cmd_vel_timeout_(0.5),
+    base_frame_id_("base_footprint"),
+    odom_frame_id_("odom"),
+    enable_odom_tf_(true),
+    angle_tolerance_(0.2),
+    post_date_odom_tf_(true) {}
 
 bool TricycleController::init(hardware_interface::RobotHW *robot_hw,
                               ros::NodeHandle &root_nh,
@@ -55,7 +61,7 @@ bool TricycleController::init(hardware_interface::RobotHW *robot_hw,
     ROS_INFO_STREAM_NAMED(name_, "Velocity rolling window size of "
                           << velocity_rolling_window_size << ".");
 
-    odometry_.setVelocityRollingWindowSize(velocity_rolling_window_size);
+    odometry_.setVelocityRollingWindowSize(static_cast<size_t>(velocity_rolling_window_size));
 
     // Twist command related:
     controller_nh.param("cmd_vel_timeout", cmd_vel_timeout_, cmd_vel_timeout_);
@@ -118,17 +124,20 @@ bool TricycleController::init(hardware_interface::RobotHW *robot_hw,
     urdf_geometry_parser::UrdfGeometryParser uvk(root_nh, base_frame_id_);
 
     if (lookup_wheel_radius)
+    {
         if (!uvk.getJointRadius(drive_wheel_joint_name, wheel_radius_))
         {
             ROS_ERROR_STREAM("Failed to get wheel radius, aborting.");
             return false;
         }
-        else
-        {
-            controller_nh.setParam("wheel_radius", wheel_radius_);
-        }
+    }
+    else
+    {
+        controller_nh.setParam("wheel_radius", wheel_radius_);
+    }
 
     if (lookup_wheel_base)
+    {
         // Does not take z into account
         // TODO: make more general, use getTransformVector maybe?
         if (!uvk.getDistanceBetweenJoints(base_frame_id_ + std::string("_joint"), steer_joint_name,
@@ -137,10 +146,11 @@ bool TricycleController::init(hardware_interface::RobotHW *robot_hw,
             ROS_ERROR_STREAM("Failed to get position of steer joint, aborting.");
             return false;
         }
-        else
-        {
-            controller_nh.setParam("wheel_base", wheel_base_);
-        }
+    }
+    else
+    {
+        controller_nh.setParam("wheel_base", wheel_base_);
+    }
 
     // Regardless of how we got the separation and radius, use them
     // to set the odometry parameters
